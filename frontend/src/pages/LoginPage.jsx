@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Importar useNavigate
+import Swal from "sweetalert2"; // Importa SweetAlert2
+import API_BASE_URL from "../config";  // Asegúrate de que la ruta sea la correcta
+
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -10,35 +13,54 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError(""); // Limpiar errores previos
-
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password }),  // Enviar username y password
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await response.json();
-      console.log(data); // Ver la respuesta de login
-
       if (!response.ok) {
         setError(data.detail || "Credenciales inválidas");
         return;
       }
 
-      // Guardar el token en localStorage y redirigir según el rol
+      // Guardar el token en localStorage
       localStorage.setItem("token", data.access_token);
+
+      // Decodificar token para obtener el rol
       const decodedToken = JSON.parse(atob(data.access_token.split(".")[1]));
       const userRole = decodedToken.role;
 
+      // Redirigir dependiendo del rol
       if (userRole === "admin") {
-        navigate("/admin");  // Redirigir al panel de administración
+        Swal.fire({
+          icon: "success",
+          title: "Bienvenido Administrador",
+          text: "Redirigiendo al dashboard de administración.",
+          background: "#1c1c1c",
+          color: "#fff",
+          confirmButtonColor: "#4CAF50",
+        }).then(() => {
+          navigate("/admin"); // Redirige al dashboard del administrador
+        });
       } else {
-        navigate("/user");  // Redirigir al panel de usuario
+        Swal.fire({
+          icon: "success",
+          title: "Bienvenido Usuario",
+          text: "Redirigiendo al dashboard del usuario.",
+          background: "#1c1c1c",
+          color: "#fff",
+          confirmButtonColor: "#4CAF50",
+        }).then(() => {
+          navigate("/user"); // Redirige al dashboard del usuario
+        });
       }
     } catch (err) {
+      console.log("Error de conexión:", err);  // Muestra el error en la consola
       setError("Error de conexión con el servidor.");
     }
   };

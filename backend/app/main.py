@@ -10,16 +10,17 @@ app = FastAPI()
 # Configurar CORS (permite comunicación entre backend y frontend)
 from fastapi.middleware.cors import CORSMiddleware
 
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Permitir todas las URLs, o especifica solo tu frontend
+    allow_origins=["*"],  # Asegúrate de que esté configurado correctamente, puedes probar con un dominio específico
     allow_credentials=True,
-    allow_methods=["*"],  # Permitir todos los métodos
-    allow_headers=["*"],  # Permitir todos los encabezados
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
 # Incluir rutas desde los archivos de vistas (views)
 app.include_router(recomendacion_router)
-app.include_router(auth_router)  # Agregamos las rutas de autenticación
+app.include_router(auth_router, prefix="/auth")  # Agregamos las rutas de autenticación
 
