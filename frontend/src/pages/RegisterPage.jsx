@@ -12,7 +12,7 @@ const RegisterPage = () => {
     e.preventDefault();
     setError(""); // Limpiar errores previos
     try {
-      const response = await fetch(`${API_BASE_URL}/register`, {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

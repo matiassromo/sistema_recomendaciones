@@ -15,13 +15,12 @@ const UserDashboard = () => {
     const data = await response.json();
     setProductos(data);
   };
-
   const handleCompra = async (productoId) => {
     const token = localStorage.getItem("token");
     await fetch("http://127.0.0.1:8000/user/comprar/", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json", 
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ producto_id: productoId, cantidad }),
