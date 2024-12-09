@@ -6,8 +6,8 @@ class Producto(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String, index=True)
-    descripcion = Column(String, nullable=True)
+    stock = Column(Integer, default=0)  # Definir el campo stock como entero
     precio = Column(Float)
 
     def __repr__(self):
-        return f"<Producto(id={self.id}, nombre={self.nombre}, precio={self.precio})>"
+        return f"<Producto(id={self.id}, nombre={self.nombre}, stock={self.stock}, precio={self.precio})>"

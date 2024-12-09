@@ -15,7 +15,9 @@ class UserLogin(BaseModel):
     username: str
     password: str
 
-router = APIRouter()
+router = APIRouter(
+    tags=["Autenticación"]  # Nombre del grupo en Swagger UI
+)
 
 # Función para obtener la sesión de la base de datos
 def get_db():
