@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
+
 
 const AdminDashboard = () => {
   const [productos, setProductos] = useState([]);
@@ -50,8 +52,8 @@ const AdminDashboard = () => {
         },
         body: JSON.stringify({
           nombre,
-          stock: parseInt(stock, 10), // Asegúrate de convertirlo a entero
-          precio: parseFloat(precio), // Asegúrate de convertirlo a float
+          stock: parseInt(stock, 10),
+          precio: parseFloat(precio),
         }),
       });
   
@@ -64,48 +66,100 @@ const AdminDashboard = () => {
       }
   
       setNombre("");
-      setStock(""); // Limpia el stock
+      setStock("");
       setPrecio("");
       setEditId(null);
       setError(null);
       fetchProductos();
+  
+      Swal.fire({
+        icon: "success",
+        title: editId ? "Producto actualizado" : "Producto agregado",
+        text: `El producto "${nombre}" ha sido ${editId ? "actualizado" : "agregado"} con éxito.`,
+        background: "#1c1c1c",
+          color: "#fff",
+          confirmButtonColor: "#4CAF50",
+      });
     } catch (err) {
       console.error(err);
-      setError("Hubo un problema al guardar el producto. Intenta nuevamente.");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Hubo un problema al guardar el producto. Intenta nuevamente.",
+        background: "#1c1c1c",
+          color: "#fff",
+          confirmButtonColor: "#4CAF50",
+      });
     }
   };
   
 
   const handleDeleteProducto = async (id) => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://127.0.0.1:8000/admin/productos/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+    const producto = productos.find((p) => p.id === id); // Encuentra el producto por ID
+  
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: `Estás a punto de eliminar el producto "${producto.nombre}". Esta acción no se puede deshacer.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+      background: "#1c1c1c",
+          color: "#fff",
+          confirmButtonColor: "#4CAF50",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const token = localStorage.getItem("token");
+          const response = await fetch(
+            `http://127.0.0.1:8000/admin/productos/${id}`,
+            {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+  
+          if (!response.ok) {
+            throw new Error("Error al eliminar el producto");
+          }
+  
+          fetchProductos();
+  
+          Swal.fire({
+            icon: "success",
+            title: "Eliminado",
+            text: `El producto "${producto.nombre}" ha sido eliminado con éxito.`,
+            background: "#1c1c1c",
+          color: "#fff",
+          confirmButtonColor: "#4CAF50",
+          });
+        } catch (err) {
+          console.error(err);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "No se pudo eliminar el producto. Intenta nuevamente.",
+            background: "#1c1c1c",
+          color: "#fff",
+          confirmButtonColor: "#4CAF50",
+          });
         }
-      );
-
-      if (!response.ok) {
-        throw new Error("Error al eliminar el producto");
       }
-
-      fetchProductos();
-    } catch (err) {
-      console.error(err);
-      setError("No se pudo eliminar el producto. Intenta nuevamente.");
-    }
+    });
   };
+  
 
   const handleEditProducto = (producto) => {
-    setEditId(producto.id);
-    setNombre(producto.nombre);
-    setStock(producto.stock.toString());
-    setPrecio(producto.precio.toString());
+    setEditId(producto.id); // Establece el ID del producto a editar
+    setNombre(producto.nombre); // Establece el nombre en el formulario
+    setStock(producto.stock.toString()); // Establece el stock convertido a string en el formulario
+    setPrecio(producto.precio.toString()); // Establece el precio convertido a string en el formulario
   };
+  
 
   useEffect(() => {
     fetchProductos();
@@ -117,19 +171,20 @@ const AdminDashboard = () => {
       maxWidth: "800px",
       margin: "50px auto",
       padding: "20px",
-      backgroundColor: "#fff",
+      backgroundColor: "#2c2c2c",
       borderRadius: "8px",
-      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.5)",
+      color: "#fff", // Cambia el texto a blanco para contraste
     },
     title: {
       textAlign: "center",
       marginBottom: "20px",
       fontSize: "24px",
       fontWeight: "bold",
-      color: "#333",
+      color: "#fff",
     },
     errorMessage: {
-      color: "red",
+      color: "#ff4d4d",
       textAlign: "center",
       marginBottom: "20px",
     },
@@ -141,8 +196,10 @@ const AdminDashboard = () => {
     input: {
       flex: 1,
       padding: "10px",
-      border: "1px solid #ccc",
+      border: "1px solid #555", // Cambia a un color oscuro para armonía
       borderRadius: "4px",
+      backgroundColor: "#3c3c3c", // Fondo oscuro para los inputs
+      color: "#fff",
     },
     button: {
       padding: "10px 15px",
@@ -161,24 +218,27 @@ const AdminDashboard = () => {
       width: "100%",
       borderCollapse: "collapse",
       marginTop: "20px",
-      backgroundColor: "#f9f9f9",
+      backgroundColor: "#3c3c3c", // Fondo oscuro para la tabla
+      color: "#fff",
     },
     tableHeader: {
-      backgroundColor: "#f4f4f4",
+      backgroundColor: "#444", // Color oscuro para el encabezado
       padding: "12px",
-      border: "1px solid #ddd",
+      border: "1px solid #555",
       textAlign: "left",
       fontWeight: "bold",
       fontSize: "16px",
+      color: "#fff",
     },
     tableRow: {
-      borderBottom: "1px solid #ddd",
+      borderBottom: "1px solid #555",
     },
     tableCell: {
       padding: "10px",
-      border: "1px solid #ddd",
+      border: "1px solid #555",
       textAlign: "left",
       fontSize: "14px",
+      color: "#fff",
     },
     actionButtons: {
       display: "flex",
@@ -192,9 +252,6 @@ const AdminDashboard = () => {
     },
   };
   
-
-
-
   return (
     <div style={styles.container}>
       <h2 style={styles.title}>Dashboard del Administrador</h2>

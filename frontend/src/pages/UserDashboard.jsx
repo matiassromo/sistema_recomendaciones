@@ -2,11 +2,10 @@ import React, { useState, useEffect } from "react";
 
 const UserDashboard = () => {
   const [productos, setProductos] = useState([]);
-  const [cantidad, setCantidad] = useState(1);
 
   const fetchProductos = async () => {
     const token = localStorage.getItem("token");
-    const response = await fetch("http://127.0.0.1:8000/admin/productos/", {
+    const response = await fetch("http://127.0.0.1:8000/user/productos/", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -15,10 +14,11 @@ const UserDashboard = () => {
     const data = await response.json();
     setProductos(data);
   };
-  
+
   const handleCompra = async (productoId) => {
     const token = localStorage.getItem("token");
-    await fetch("http://127.0.0.1:8000/user/comprar/", {
+    const cantidad = 1; // Siempre resta 1 por ahora, puedes hacerlo dinámico si es necesario
+    const response = await fetch("http://127.0.0.1:8000/user/comprar", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -26,7 +26,13 @@ const UserDashboard = () => {
       },
       body: JSON.stringify({ producto_id: productoId, cantidad }),
     });
-    alert("Compra realizada con éxito.");
+
+    if (response.ok) {
+      alert("Compra realizada con éxito.");
+      fetchProductos(); // Refresca la lista de productos con el stock actualizado
+    } else {
+      alert("Error al realizar la compra.");
+    }
   };
 
   useEffect(() => {
@@ -38,30 +44,37 @@ const UserDashboard = () => {
       maxWidth: "800px",
       margin: "50px auto",
       padding: "20px",
-      backgroundColor: "#fff",
+      backgroundColor: "#1e1e2f", // Fondo oscuro
       borderRadius: "8px",
-      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.5)",
+      color: "#f5f5f5",
     },
     title: {
       textAlign: "center",
       marginBottom: "20px",
       fontSize: "24px",
       fontWeight: "bold",
+      color: "#ffffff",
     },
     table: {
       width: "100%",
       borderCollapse: "collapse",
+      marginTop: "20px",
+      backgroundColor: "#2d2d3a",
     },
     tableHeader: {
-      backgroundColor: "#f4f4f4",
+      backgroundColor: "#1e1e2f",
       fontWeight: "bold",
       textAlign: "left",
       padding: "10px",
-      border: "1px solid #ddd",
+      border: "1px solid #444",
+      color: "#f5f5f5",
     },
     tableCell: {
       padding: "10px",
-      border: "1px solid #ddd",
+      border: "1px solid #444",
+      color: "#f5f5f5",
+      textAlign: "left",
     },
     actionButton: {
       padding: "8px 15px",
@@ -72,6 +85,7 @@ const UserDashboard = () => {
       backgroundColor: "#4caf50",
     },
   };
+  
 
   return (
     <div style={styles.container}>
@@ -81,6 +95,7 @@ const UserDashboard = () => {
           <tr>
             <th style={styles.tableHeader}>Nombre</th>
             <th style={styles.tableHeader}>Precio</th>
+            <th style={styles.tableHeader}>Stock</th>
             <th style={styles.tableHeader}>Acciones</th>
           </tr>
         </thead>
@@ -89,6 +104,7 @@ const UserDashboard = () => {
             <tr key={producto.id}>
               <td style={styles.tableCell}>{producto.nombre}</td>
               <td style={styles.tableCell}>${producto.precio.toFixed(2)}</td>
+              <td style={styles.tableCell}>{producto.stock} unidades</td>
               <td style={styles.tableCell}>
                 <button
                   style={styles.actionButton}
