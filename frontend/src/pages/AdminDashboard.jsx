@@ -259,7 +259,7 @@ const AdminDashboard = () => {
     {productos.map((producto) => (
       <tr key={producto.id} style={styles.tableRow}>
         <td style={styles.tableCell}>{producto.nombre}</td>
-        <td style={styles.tableCell}>{producto.stock}</td>
+        <td style={styles.tableCell}>{producto.stock} unidades</td>
         <td style={styles.tableCell}>${producto.precio.toFixed(2)}</td>
         <td style={styles.tableCell}>
           <button
