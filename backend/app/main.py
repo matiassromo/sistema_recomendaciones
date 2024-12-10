@@ -15,7 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Asegúrate de que esté configurado correctamente, puedes probar con un dominio específico
+    allow_origins=["*"],  # Asegúrate de que esté configurado correctamente, puedes probar con un dominio específico
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
